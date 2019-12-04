@@ -360,8 +360,8 @@ inb$roh = rep(c("1mb","5mb","10mb","20mb"), each = 4)
 inb$roh = factor(inb$roh, levels = c("1mb","5mb","10mb","20mb"))
 inb$region = factor(inb$region, levels = c("ranthambore","south","north","zoo"))
 
-pd = position_dodge(0.3)
-ggp = ggplot(data = inb, aes(x = region, y = mean, col = roh)) +
+pd = position_dodge(0.2)
+ggp = ggplot(data = inb[inb$roh %in% c("1mb","5mb"),], aes(x = region, y = mean, col = roh)) +
   geom_point(size = 4, position = pd) +
   geom_errorbar(aes(ymin = cil, ymax = cir), size = 0.5, width = 0.2, position = pd) +
   xlab("geographic region") +
@@ -380,6 +380,29 @@ ggp1 = ggp +
                    labels = c("North-West\nIndia","South\nIndia","Central\nCluster","Zoo")) 
 
 png('roh1.png', units="in", width=10, height=7, res=1000)
+ggp1
+dev.off()
+
+pd = position_dodge(0.2)
+ggp = ggplot(data = inb[inb$roh %in% c("10mb","20mb"),], aes(x = region, y = mean, col = roh)) +
+  geom_point(size = 4, position = pd) +
+  geom_errorbar(aes(ymin = cil, ymax = cir), size = 0.5, width = 0.2, position = pd) +
+  xlab("geographic region") +
+  ylab("proportion of homozygosity runs")+
+  theme_tufte_revised()
+
+
+ggp1 = ggp +
+  theme(axis.title.x = element_text(size = 16), axis.text.x = element_text(size = 12),
+        axis.title.y = element_text(angle = 90, size = 16), axis.text.y = element_text(size = 14)) +
+  theme(legend.title = element_blank(), legend.text = element_text(size = 12)) +
+  theme(text=element_text(family="Gill Sans MT")) +
+  #scale_y_continuous(breaks = c(0,0.2,0.4,0.6,0.8,1), 
+  #                   limits = c(0,1)) +
+  scale_x_discrete(breaks = c("ranthambore","south","north","zoo"),
+                   labels = c("North-West\nIndia","South\nIndia","Central\nCluster","Zoo")) 
+
+png('roh2.png', units="in", width=10, height=7, res=1000)
 ggp1
 dev.off()
 
@@ -405,7 +428,7 @@ ggp1 = ggp +
   theme(strip.text.x = element_text(size = 15))
 
 
-png('roh2.png', units="in", width=10, height=7, res=1000)
+png('roh3.png', units="in", width=10, height=7, res=1000)
 ggp1
 dev.off()
 
