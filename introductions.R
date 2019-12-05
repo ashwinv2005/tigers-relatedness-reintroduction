@@ -2,6 +2,9 @@ library(tidyverse)
 library(ggthemes)
 theme_set(theme_tufte())
 
+cols = c("#869B27", "#E49B36", "#A13E2B", "#78CAE0", "#B69AC9", "#EA5599", "#31954E", "#493F3D",
+         "#CC6666", "#9999CC", "#000000", "#66CC99")
+
 is.extrafont.installed <- function(){
   if(is.element("extrafont", installed.packages()[,1])){
     library(extrafont)
@@ -72,8 +75,10 @@ data$pair = factor(data$pair, levels = c("Ranthambore-Ranthambore","Ranthambore-
                                          "Ranthambore-Kaziranga","Ranthambore-Lalgarh",
                                          "Ranthambore-Wayanad","Ranthambore-Periyar","Ranthambore-Zoo"))
 
-fit1 = glm(data = data, prop1 ~ pair, weights = ind1roh1, contrasts = list(pair = cMat), 
-           family = "binomial")
+fit1 = glm(data = data, prop1 ~ pair, 
+           #weights = ind1roh1, 
+           contrasts = list(pair = cMat), 
+           family = "quasibinomial")
 
 pred1 = predict(fit1, data.frame(pair = c("Ranthambore-Ranthambore","Ranthambore-Corbett",
                                   "Ranthambore-Chandrapur","Ranthambore-Kanha",
@@ -88,7 +93,7 @@ ranthambore1 = data.frame(pair = c("Ranthambore-Ranthambore","Ranthambore-Corbet
                           proprem = pred1$fit, se = pred1$se.fit)
 
 ranthambore1 = ranthambore1 %>% arrange(desc(proprem))
-ranthambore1$length = "above10k"
+ranthambore1$length = ">0.01Mb"
 
 ##########################
 
@@ -100,8 +105,10 @@ data$pair = factor(data$pair, levels = c("Ranthambore-Ranthambore","Ranthambore-
                                          "Ranthambore-Kaziranga","Ranthambore-Lalgarh",
                                          "Ranthambore-Wayanad","Ranthambore-Periyar","Ranthambore-Zoo"))
 
-fit2 = glm(data = data, prop2 ~ pair, weights = ind1roh2, contrasts = list(pair = cMat), 
-           family = "binomial")
+fit2 = glm(data = data, prop2 ~ pair, 
+           #weights = ind1roh2, 
+           contrasts = list(pair = cMat), 
+           family = "quasibinomial")
 
 pred2 = predict(fit2, data.frame(pair = c("Ranthambore-Ranthambore","Ranthambore-Corbett",
                                           "Ranthambore-Chandrapur","Ranthambore-Kanha",
@@ -116,7 +123,7 @@ ranthambore2 = data.frame(pair = c("Ranthambore-Ranthambore","Ranthambore-Corbet
                           proprem = pred2$fit, se = pred2$se.fit)
 
 ranthambore2 = ranthambore2 %>% arrange(desc(proprem))
-ranthambore2$length = "above100k"
+ranthambore2$length = ">0.1Mb"
 
 ###########################
 
@@ -128,8 +135,10 @@ data$pair = factor(data$pair, levels = c("Ranthambore-Ranthambore","Ranthambore-
                                          "Ranthambore-Kaziranga","Ranthambore-Lalgarh",
                                          "Ranthambore-Wayanad","Ranthambore-Periyar","Ranthambore-Zoo"))
 
-fit3 = glm(data = data, prop3 ~ pair, weights = ind1roh3, contrasts = list(pair = cMat), 
-           family = "binomial")
+fit3 = glm(data = data, prop3 ~ pair, 
+           #weights = ind1roh3, 
+           contrasts = list(pair = cMat), 
+           family = "quasibinomial")
 
 pred3 = predict(fit3, data.frame(pair = c("Ranthambore-Ranthambore","Ranthambore-Corbett",
                                           "Ranthambore-Chandrapur","Ranthambore-Kanha",
@@ -144,7 +153,7 @@ ranthambore3 = data.frame(pair = c("Ranthambore-Ranthambore","Ranthambore-Corbet
                           proprem = pred3$fit, se = pred3$se.fit)
 
 ranthambore3 = ranthambore3 %>% arrange(desc(proprem))
-ranthambore3$length = "above1000k"
+ranthambore3$length = ">1Mb"
 
 ranthambore = rbind(ranthambore1,ranthambore2,ranthambore3)
 
@@ -161,8 +170,10 @@ data$pair = factor(data$pair, levels = c("Wayanad-Wayanad","Wayanad-Corbett",
                                          "Wayanad-Kaziranga","Wayanad-Lalgarh",
                                          "Wayanad-Ranthambore","Wayanad-Periyar","Wayanad-Zoo"))
 
-fit1 = glm(data = data, prop1 ~ pair, weights = ind1roh1, contrasts = list(pair = cMat), 
-           family = "binomial")
+fit1 = glm(data = data, prop1 ~ pair, 
+           #weights = ind1roh1, 
+           contrasts = list(pair = cMat), 
+           family = "quasibinomial")
 
 pred1 = predict(fit1, data.frame(pair = c("Wayanad-Wayanad","Wayanad-Corbett",
                                           "Wayanad-Chandrapur","Wayanad-Kanha",
@@ -177,7 +188,7 @@ wayanad1 = data.frame(pair = c("Wayanad-Wayanad","Wayanad-Corbett",
                           proprem = pred1$fit, se = pred1$se.fit)
 
 wayanad1 = wayanad1 %>% arrange(desc(proprem))
-wayanad1$length = "above10k"
+wayanad1$length = ">0.01Mb"
 
 ##########################
 
@@ -189,8 +200,10 @@ data$pair = factor(data$pair, levels = c("Wayanad-Wayanad","Wayanad-Corbett",
                                          "Wayanad-Kaziranga","Wayanad-Lalgarh",
                                          "Wayanad-Ranthambore","Wayanad-Periyar","Wayanad-Zoo"))
 
-fit2 = glm(data = data, prop2 ~ pair, weights = ind1roh2, contrasts = list(pair = cMat), 
-           family = "binomial")
+fit2 = glm(data = data, prop2 ~ pair, 
+           #weights = ind1roh2, 
+           contrasts = list(pair = cMat), 
+           family = "quasibinomial")
 
 pred2 = predict(fit2, data.frame(pair = c("Wayanad-Wayanad","Wayanad-Corbett",
                                           "Wayanad-Chandrapur","Wayanad-Kanha",
@@ -205,7 +218,7 @@ wayanad2 = data.frame(pair = c("Wayanad-Wayanad","Wayanad-Corbett",
                           proprem = pred2$fit, se = pred2$se.fit)
 
 wayanad2 = wayanad2 %>% arrange(desc(proprem))
-wayanad2$length = "above100k"
+wayanad2$length = ">0.1Mb"
 
 ###########################
 
@@ -217,8 +230,10 @@ data$pair = factor(data$pair, levels = c("Wayanad-Wayanad","Wayanad-Corbett",
                                          "Wayanad-Kaziranga","Wayanad-Lalgarh",
                                          "Wayanad-Ranthambore","Wayanad-Periyar","Wayanad-Zoo"))
 
-fit3 = glm(data = data, prop3 ~ pair, weights = ind1roh3, contrasts = list(pair = cMat), 
-           family = "binomial")
+fit3 = glm(data = data, prop3 ~ pair, 
+           #weights = ind1roh3, 
+           contrasts = list(pair = cMat), 
+           family = "quasibinomial")
 
 pred3 = predict(fit3, data.frame(pair = c("Wayanad-Wayanad","Wayanad-Corbett",
                                           "Wayanad-Chandrapur","Wayanad-Kanha",
@@ -233,7 +248,7 @@ wayanad3 = data.frame(pair = c("Wayanad-Wayanad","Wayanad-Corbett",
                           proprem = pred3$fit, se = pred3$se.fit)
 
 wayanad3 = wayanad3 %>% arrange(desc(proprem))
-wayanad3$length = "above1000k"
+wayanad3$length = ">1Mb"
 
 wayanad = rbind(wayanad1,wayanad2,wayanad3)
 
@@ -246,14 +261,23 @@ intro$cir = intro$proprem + 1.96*intro$se
 intro$cil[intro$cil<0] = 0
 intro$cir[intro$cir>1] = 0
 
-pd = position_dodge(1)
+pd = position_dodge(0.5)
 
 ggp = ggplot(data = intro, aes(x = right, y = proprem, col = length)) +
   facet_wrap(. ~ left, ncol = 1) +
-  geom_point(size = 4, position = pd) +
-  geom_errorbar(aes(ymin = cil, ymax = cir), size = 0.5, width = 0.8, position = pd) +
-  xlab("population to be introduced") +
-  ylab("proportion of homozygous runs remaining")+
+  geom_point(size = 2, position = pd) +
+  geom_errorbar(aes(ymin = cil, ymax = cir), size = 0.5, width = 0.2, position = pd) +
+  xlab("rescue population") +
+  ylab("proportion of ROH remaining") +
+  geom_vline(xintercept = 1.5, linetype = "dotted", size = 0.5, col = "grey") +
+  geom_vline(xintercept = 2.5, linetype = "dotted", size = 0.5, col = "grey") +
+  geom_vline(xintercept = 3.5, linetype = "dotted", size = 0.5, col = "grey") +
+  geom_vline(xintercept = 4.5, linetype = "dotted", size = 0.5, col = "grey") +
+  geom_vline(xintercept = 5.5, linetype = "dotted", size = 0.5, col = "grey") +
+  geom_vline(xintercept = 6.5, linetype = "dotted", size = 0.5, col = "grey") +
+  geom_vline(xintercept = 7.5, linetype = "dotted", size = 0.5, col = "grey") +
+  geom_vline(xintercept = 8.5, linetype = "dotted", size = 0.5, col = "grey") +
+  scale_colour_manual(breaks = c(">0.01Mb",">0.1Mb",">1Mb"), values = cols[1:3]) +
   theme_tufte_revised()
 
 
