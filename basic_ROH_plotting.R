@@ -100,7 +100,7 @@ ggp = ggplot(data = b, aes(x = pairs, y = prop, col = type, fill = type)) +
   geom_bar(stat = "identity", width=.5, position = "dodge") +
   geom_errorbar(aes(ymin = cil, ymax = cir), size = 0.5, width = 0.1, col = "black", position = pd) +
   xlab("mating pair") +
-  ylab("proportion of ROH runs in offspring")+
+  ylab("proportion of genome in ROH")+
   theme_tufte_revised()
 
 
@@ -110,8 +110,8 @@ ggp2 = ggp +
   theme(legend.title = element_blank(), legend.text = element_text(size = 12), 
         legend.position = "bottom") +
   theme(text=element_text(family="Gill Sans MT")) +
-  scale_colour_manual(breaks = c(">0.1Mb",">1Mb"), values = cols[c(2,3)]) +
-  scale_fill_manual(breaks = c(">0.1Mb",">1Mb"), values = cols[c(2,3)]) +
+  scale_colour_manual(breaks = c(">0.01Mb",">1Mb"), values = cols[c(2,3)]) +
+  scale_fill_manual(breaks = c(">0.01Mb",">1Mb"), values = cols[c(2,3)]) +
   scale_y_continuous(breaks = c(0,0.1,0.2,0.3,0.4))
 
 library(cowplot)
@@ -125,7 +125,7 @@ dev.off()
 
 
 
-c$type = factor(c$type, levels = c("0.01-0.1Mb","0.1-1Mb",">1Mb"))
+c$type = factor(c$type, levels = c(">0.01Mb",">0.1Mb",">1Mb"))
 
 pd = position_dodge(0.5)
 ggp = ggplot(data = c, aes(x = pop, y = length, col = type, fill = type)) +
@@ -142,8 +142,8 @@ ggp1 = ggp +
   theme(legend.title = element_blank(), legend.text = element_text(size = 12), 
         legend.position = "bottom") +
   theme(text=element_text(family="Gill Sans MT")) +
-  scale_colour_manual(breaks = c("0.01-0.1Mb","0.1-1Mb",">1Mb"), values = cols[c(1,2,3)]) +
-  scale_fill_manual(breaks = c("0.01-0.1Mb","0.1-1Mb",">1Mb"), values = cols[c(1,2,3)]) +
+  scale_colour_manual(breaks = c(">0.01Mb",">0.1Mb",">1Mb"), values = cols[c(1,2,3)]) +
+  scale_fill_manual(breaks = c(">0.01Mb",">0.1Mb",">1Mb"), values = cols[c(1,2,3)]) +
   scale_y_continuous(breaks = c(0,200,400,600,800,1000))
 
 
