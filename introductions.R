@@ -56,14 +56,15 @@ theme_tufte_revised <- function(base_size = 11, base_family = base_font_family_t
 require(extrafont)
 require(lme4)
 
-a = read.csv("introducedroh.csv")
+#a = read.csv("introducedroh.csv")
+a = read.csv("shared_IBD.csv")
 a[is.na(a)] = 0
 
 
 #a$ind1roh1 = scale(a$ind1roh1,center = F)
 
-mat = rbind(c(-1,1,0,0,0,0,0,0,0),c(-1,0,1,0,0,0,0,0,0),c(-1,0,0,1,0,0,0,0,0),c(-1,0,0,0,1,0,0,0,0),
-            c(-1,0,0,0,0,1,0,0,0),c(-1,0,0,0,0,0,1,0,0),c(-1,0,0,0,0,0,0,1,0),c(-1,0,0,0,0,0,0,0,1))
+mat = rbind(c(-1,1,0,0,0,0,0,0),c(-1,0,1,0,0,0,0,0),c(-1,0,0,1,0,0,0,0),c(-1,0,0,0,1,0,0,0),
+            c(-1,0,0,0,0,1,0,0),c(-1,0,0,0,0,0,1,0),c(-1,0,0,0,0,0,0,1))
 library(MASS)
 cMat = ginv(mat)
 
@@ -71,23 +72,23 @@ a$prop1 = a$roh1/a$ind1roh1
 
 data = a[a$res1 == "Ranthambore",]
 data$pair = factor(data$pair, levels = c("Ranthambore-Ranthambore","Ranthambore-Corbett",
-                                         "Ranthambore-Chandrapur","Ranthambore-Kanha",
+                                         "Ranthambore-Kanha",
                                          "Ranthambore-Kaziranga","Ranthambore-Lalgarh",
                                          "Ranthambore-Wayanad","Ranthambore-Periyar","Ranthambore-Zoo"))
 
 fit1 = glm(data = data, prop1 ~ pair, 
            #weights = ind1roh1, 
            contrasts = list(pair = cMat), 
-           family = "quasibinomial")
+           family = "quasipoisson")
 
 pred1 = predict(fit1, data.frame(pair = c("Ranthambore-Ranthambore","Ranthambore-Corbett",
-                                  "Ranthambore-Chandrapur","Ranthambore-Kanha",
+                                  "Ranthambore-Kanha",
                                   "Ranthambore-Kaziranga","Ranthambore-Lalgarh",
                                   "Ranthambore-Wayanad","Ranthambore-Periyar","Ranthambore-Zoo")), 
         se.fit = T, type = "response")
 
 ranthambore1 = data.frame(pair = c("Ranthambore-Ranthambore","Ranthambore-Corbett",
-                                   "Ranthambore-Chandrapur","Ranthambore-Kanha",
+                                   "Ranthambore-Kanha",
                                    "Ranthambore-Kaziranga","Ranthambore-Lalgarh",
                                    "Ranthambore-Wayanad","Ranthambore-Periyar","Ranthambore-Zoo"),
                           proprem = pred1$fit, se = pred1$se.fit)
@@ -101,23 +102,23 @@ a$prop2 = a$roh2/a$ind1roh2
 
 data = a[a$res1 == "Ranthambore",]
 data$pair = factor(data$pair, levels = c("Ranthambore-Ranthambore","Ranthambore-Corbett",
-                                         "Ranthambore-Chandrapur","Ranthambore-Kanha",
+                                         "Ranthambore-Kanha",
                                          "Ranthambore-Kaziranga","Ranthambore-Lalgarh",
                                          "Ranthambore-Wayanad","Ranthambore-Periyar","Ranthambore-Zoo"))
 
 fit2 = glm(data = data, prop2 ~ pair, 
            #weights = ind1roh2, 
            contrasts = list(pair = cMat), 
-           family = "quasibinomial")
+           family = "quasipoisson")
 
 pred2 = predict(fit2, data.frame(pair = c("Ranthambore-Ranthambore","Ranthambore-Corbett",
-                                          "Ranthambore-Chandrapur","Ranthambore-Kanha",
+                                          "Ranthambore-Kanha",
                                           "Ranthambore-Kaziranga","Ranthambore-Lalgarh",
                                           "Ranthambore-Wayanad","Ranthambore-Periyar","Ranthambore-Zoo")), 
                 se.fit = T, type = "response")
 
 ranthambore2 = data.frame(pair = c("Ranthambore-Ranthambore","Ranthambore-Corbett",
-                                   "Ranthambore-Chandrapur","Ranthambore-Kanha",
+                                   "Ranthambore-Kanha",
                                    "Ranthambore-Kaziranga","Ranthambore-Lalgarh",
                                    "Ranthambore-Wayanad","Ranthambore-Periyar","Ranthambore-Zoo"),
                           proprem = pred2$fit, se = pred2$se.fit)
@@ -125,37 +126,9 @@ ranthambore2 = data.frame(pair = c("Ranthambore-Ranthambore","Ranthambore-Corbet
 ranthambore2 = ranthambore2 %>% arrange(desc(proprem))
 ranthambore2$length = ">0.1Mb"
 
-###########################
 
-a$prop3 = a$roh3/a$ind1roh3
 
-data = a[a$res1 == "Ranthambore",]
-data$pair = factor(data$pair, levels = c("Ranthambore-Ranthambore","Ranthambore-Corbett",
-                                         "Ranthambore-Chandrapur","Ranthambore-Kanha",
-                                         "Ranthambore-Kaziranga","Ranthambore-Lalgarh",
-                                         "Ranthambore-Wayanad","Ranthambore-Periyar","Ranthambore-Zoo"))
-
-fit3 = glm(data = data, prop3 ~ pair, 
-           #weights = ind1roh3, 
-           contrasts = list(pair = cMat), 
-           family = "quasibinomial")
-
-pred3 = predict(fit3, data.frame(pair = c("Ranthambore-Ranthambore","Ranthambore-Corbett",
-                                          "Ranthambore-Chandrapur","Ranthambore-Kanha",
-                                          "Ranthambore-Kaziranga","Ranthambore-Lalgarh",
-                                          "Ranthambore-Wayanad","Ranthambore-Periyar","Ranthambore-Zoo")), 
-                se.fit = T, type = "response")
-
-ranthambore3 = data.frame(pair = c("Ranthambore-Ranthambore","Ranthambore-Corbett",
-                                   "Ranthambore-Chandrapur","Ranthambore-Kanha",
-                                   "Ranthambore-Kaziranga","Ranthambore-Lalgarh",
-                                   "Ranthambore-Wayanad","Ranthambore-Periyar","Ranthambore-Zoo"),
-                          proprem = pred3$fit, se = pred3$se.fit)
-
-ranthambore3 = ranthambore3 %>% arrange(desc(proprem))
-ranthambore3$length = ">1Mb"
-
-ranthambore = rbind(ranthambore1,ranthambore2,ranthambore3)
+ranthambore = rbind(ranthambore1,ranthambore2)
 
 
 
@@ -166,23 +139,23 @@ a$prop1 = a$roh1/a$ind1roh1
 
 data = a[a$res1 == "Wayanad",]
 data$pair = factor(data$pair, levels = c("Wayanad-Wayanad","Wayanad-Corbett",
-                                         "Wayanad-Chandrapur","Wayanad-Kanha",
+                                         "Wayanad-Kanha",
                                          "Wayanad-Kaziranga","Wayanad-Lalgarh",
                                          "Wayanad-Ranthambore","Wayanad-Periyar","Wayanad-Zoo"))
 
 fit1 = glm(data = data, prop1 ~ pair, 
            #weights = ind1roh1, 
            contrasts = list(pair = cMat), 
-           family = "quasibinomial")
+           family = "quasipoisson")
 
 pred1 = predict(fit1, data.frame(pair = c("Wayanad-Wayanad","Wayanad-Corbett",
-                                          "Wayanad-Chandrapur","Wayanad-Kanha",
+                                          "Wayanad-Kanha",
                                           "Wayanad-Kaziranga","Wayanad-Lalgarh",
                                           "Wayanad-Ranthambore","Wayanad-Periyar","Wayanad-Zoo")), 
                 se.fit = T, type = "response")
 
 wayanad1 = data.frame(pair = c("Wayanad-Wayanad","Wayanad-Corbett",
-                                   "Wayanad-Chandrapur","Wayanad-Kanha",
+                                   "Wayanad-Kanha",
                                    "Wayanad-Kaziranga","Wayanad-Lalgarh",
                                    "Wayanad-Ranthambore","Wayanad-Periyar","Wayanad-Zoo"),
                           proprem = pred1$fit, se = pred1$se.fit)
@@ -196,23 +169,23 @@ a$prop2 = a$roh2/a$ind1roh2
 
 data = a[a$res1 == "Wayanad",]
 data$pair = factor(data$pair, levels = c("Wayanad-Wayanad","Wayanad-Corbett",
-                                         "Wayanad-Chandrapur","Wayanad-Kanha",
+                                         "Wayanad-Kanha",
                                          "Wayanad-Kaziranga","Wayanad-Lalgarh",
                                          "Wayanad-Ranthambore","Wayanad-Periyar","Wayanad-Zoo"))
 
 fit2 = glm(data = data, prop2 ~ pair, 
            #weights = ind1roh2, 
            contrasts = list(pair = cMat), 
-           family = "quasibinomial")
+           family = "quasipoisson")
 
 pred2 = predict(fit2, data.frame(pair = c("Wayanad-Wayanad","Wayanad-Corbett",
-                                          "Wayanad-Chandrapur","Wayanad-Kanha",
+                                          "Wayanad-Kanha",
                                           "Wayanad-Kaziranga","Wayanad-Lalgarh",
                                           "Wayanad-Ranthambore","Wayanad-Periyar","Wayanad-Zoo")), 
                 se.fit = T, type = "response")
 
 wayanad2 = data.frame(pair = c("Wayanad-Wayanad","Wayanad-Corbett",
-                                   "Wayanad-Chandrapur","Wayanad-Kanha",
+                                   "Wayanad-Kanha",
                                    "Wayanad-Kaziranga","Wayanad-Lalgarh",
                                    "Wayanad-Ranthambore","Wayanad-Periyar","Wayanad-Zoo"),
                           proprem = pred2$fit, se = pred2$se.fit)
@@ -220,37 +193,8 @@ wayanad2 = data.frame(pair = c("Wayanad-Wayanad","Wayanad-Corbett",
 wayanad2 = wayanad2 %>% arrange(desc(proprem))
 wayanad2$length = ">0.1Mb"
 
-###########################
 
-a$prop3 = a$roh3/a$ind1roh3
-
-data = a[a$res1 == "Wayanad",]
-data$pair = factor(data$pair, levels = c("Wayanad-Wayanad","Wayanad-Corbett",
-                                         "Wayanad-Chandrapur","Wayanad-Kanha",
-                                         "Wayanad-Kaziranga","Wayanad-Lalgarh",
-                                         "Wayanad-Ranthambore","Wayanad-Periyar","Wayanad-Zoo"))
-
-fit3 = glm(data = data, prop3 ~ pair, 
-           #weights = ind1roh3, 
-           contrasts = list(pair = cMat), 
-           family = "quasibinomial")
-
-pred3 = predict(fit3, data.frame(pair = c("Wayanad-Wayanad","Wayanad-Corbett",
-                                          "Wayanad-Chandrapur","Wayanad-Kanha",
-                                          "Wayanad-Kaziranga","Wayanad-Lalgarh",
-                                          "Wayanad-Ranthambore","Wayanad-Periyar","Wayanad-Zoo")), 
-                se.fit = T, type = "response")
-
-wayanad3 = data.frame(pair = c("Wayanad-Wayanad","Wayanad-Corbett",
-                                   "Wayanad-Chandrapur","Wayanad-Kanha",
-                                   "Wayanad-Kaziranga","Wayanad-Lalgarh",
-                                   "Wayanad-Ranthambore","Wayanad-Periyar","Wayanad-Zoo"),
-                          proprem = pred3$fit, se = pred3$se.fit)
-
-wayanad3 = wayanad3 %>% arrange(desc(proprem))
-wayanad3$length = ">1Mb"
-
-wayanad = rbind(wayanad1,wayanad2,wayanad3)
+wayanad = rbind(wayanad1,wayanad2)
 
 intro = rbind(ranthambore,wayanad)
 intro = intro %>% separate(col = pair, into = c("left", "right"), sep = "-") %>%

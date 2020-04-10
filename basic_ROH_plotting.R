@@ -76,7 +76,7 @@ b$cil[b$cil<0] = 0
 
 a$pairs = factor(a$pairs, levels = c("RTR-RTR","WAY-WAY","KTR-KTR","ZOO-ZOO","KAZ-KAZ","COR-COR"))
 b$pairs = factor(b$pairs, levels = c("RTR-RTR","WAY-WAY","KTR-KTR","ZOO-ZOO","KAZ-KAZ","COR-COR"))
-c$pop = factor(c$pop, levels = c("OTHERS","KTR","WAY","RTR"))
+c$pop = factor(c$pop, levels = c("ranthambore","wayanad","kanha","panindia"))
 
 ggp = ggplot(data = a, aes(x = pairs, y = ROH)) +
   #geom_hline(yintercept = 0.5) +
@@ -119,19 +119,19 @@ g1 = plot_grid(ggp1,ggp2,nrow=2,ncol=1,rel_widths = c(1/2, 1/2))
   
 
   
-png('roh4.png', units="in", width=10, height=10, res=1000)
+png('S4.png', units="in", width=10, height=10, res=1000)
 grid::grid.draw(g1)
 dev.off()
 
 
 
-c$type = factor(c$type, levels = c(">0.01Mb",">0.1Mb",">1Mb"))
+c$type = factor(c$type, levels = c(">0.1Mb",">1Mb"))
 
 pd = position_dodge(0.5)
 ggp = ggplot(data = c, aes(x = pop, y = length, col = type, fill = type)) +
   #geom_hline(yintercept = 0.5) +
   geom_bar(stat = "identity", width=.5, position = "dodge") +
-  xlab("population") +
+  xlab("geographic region") +
   ylab("ROH shared across individuals (Mb)")+
   theme_tufte_revised()
 
@@ -142,11 +142,13 @@ ggp1 = ggp +
   theme(legend.title = element_blank(), legend.text = element_text(size = 12), 
         legend.position = "bottom") +
   theme(text=element_text(family="Gill Sans MT")) +
-  scale_colour_manual(breaks = c(">0.01Mb",">0.1Mb",">1Mb"), values = cols[c(1,2,3)]) +
-  scale_fill_manual(breaks = c(">0.01Mb",">0.1Mb",">1Mb"), values = cols[c(1,2,3)]) +
+  scale_x_discrete(breaks = c("ranthambore","wayanad","kanha","panindia"),
+                      labels = c("Ranthambore","Wayanad","Kanha","All India")) +
+  scale_colour_manual(breaks = c(">0.1Mb",">1Mb"), values = cols[c(3,10)]) +
+  scale_fill_manual(breaks = c(">0.1Mb",">1Mb"), values = cols[c(3,10)]) +
   scale_y_continuous(breaks = c(0,200,400,600,800,1000))
 
 
-png('roh5.png', units="in", width=10, height=7, res=1000)
+png('Fig. 5.png', units="in", width=10, height=7, res=1000)
 ggp1
 dev.off()
