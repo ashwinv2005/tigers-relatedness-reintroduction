@@ -1030,7 +1030,7 @@ mat = rbind(c(1,0,0,0,-1),c(0,1,0,0,-1),c(0,0,1,0,-1),c(0,0,0,1,-1))
 library(MASS)
 cMat = ginv(mat)
 
-fit = glm(miss ~ site, weights = totalcount, data = a, contrasts = list(site = cMat), 
+fit = glm(miss ~ site, weights = totalcount_m, data = a, contrasts = list(site = cMat), 
           family = binomial(link = 'logit'))
 summary(fit)
 
@@ -1038,7 +1038,7 @@ newdata = data.frame(site = c("ranthambore","wayanad","Kanha","zoo","panindia"))
 
 pred1 = predict(fit, newdata, se.fit = T, type = "response")
 
-fit = glm(loss ~ site, weights = totalcount, data = a, contrasts = list(site = cMat), 
+fit = glm(loss ~ site, weights = totalcount_l, data = a, contrasts = list(site = cMat), 
           family = binomial(link = 'logit'))
 summary(fit)
 
@@ -1057,7 +1057,7 @@ mut$met[7] = "*"
 ggp = ggplot(data = mut, aes(x = site, y = mean*100)) +
   facet_wrap(.~type, nrow = 2, ncol = 1, scales = "free_y") +
   geom_point(size = 2) +
-  geom_errorbar(aes(ymin = (mean-ci)*100, ymax = (mean+ci)*100), size = 0.6, width = 0.2) +
+  geom_errorbar(aes(ymin = (mean-ci)*100, ymax = (mean+ci)*100), size = 0.6, width = 0.1) +
   xlab("geographic region") +
   ylab("deleterious mutations (%)")+
   theme_tufte_revised()
@@ -1074,11 +1074,16 @@ ggp1 = ggp +
   #theme(panel.background = element_rect(fill = NA, color = "black")) +
   theme(legend.position = "bottom")
 
-png('Fig. 3.png', units="in", width=7, height=7, res=1000)
+png('Fig. S2.png', units="in", width=7, height=7, res=1000)
 ggp1
 dev.off()
 
-b = a[a$site != "panindia",]
+d1 = a[a$site != "panindia",]$individual
+d2 = a[a$site == "panindia",]$individual
+diff = setdiff(d2,d1)
+bx = a[a$site != "panindia",]
+by = a[a$individual %in% diff,]
+b = rbind(bx,by)
 b1 = b2 = b
 b1$type = "missense"
 b2$type = "loss-of-function"
@@ -1116,10 +1121,48 @@ ggp1
 dev.off()
 
 
+################################## check for difference in relationship
 
-b = b %>% filter(site != "zoo")
-ggp = ggplot(data = b, aes(x = froh, y = mut_inROH, col = site, shape = type)) +
-  geom_point(size = 3) +
+
+b$comp = b$site
+b$comp = as.character(b$comp)
+b[b$comp != "ranthambore",]$comp = "all others"
+
+mat = rbind(c(-1,1))
+library(MASS)
+cMat = ginv(mat)
+
+b$comp = factor(b$comp, levels = c("all others","ranthambore"))
+
+fit = lm(mut_inROH ~ froh*comp*type, data = b, contrasts = list(comp = cMat))
+summary(fit)
+
+newdata = data.frame(comp = rep(c("all others","ranthambore"),each = 13), type = rep("missense",26), 
+                     froh = rep(seq(0,0.6,0.05),2))
+
+pred1 = predict(fit, newdata, se.fit = F, type = "response")
+
+int1 = pred1[1]
+int2 = pred1[14]
+
+slope1 = (pred1[11] - pred1[1])*2
+slope2 = (pred1[24] - pred1[14])*2
+
+
+##########################################
+
+
+
+
+#b = b %>% filter(site != "zoo")
+ggp = ggplot() +
+  geom_point(data = b, aes(x = froh, y = mut_inROH, col = site, shape = type), size = 3) +
+  #geom_smooth(data = data.frame(y = pred1[3:11], x = seq(0.1,0.6,0.05)), aes(x = x,y = y), 
+  #            se = F, col = "black", size = 0.5) +
+  #geom_smooth(data = data.frame(y = pred1[21:26], x = seq(0.35,0.6,0.05)), aes(x = x,y = y), 
+  #            se = F, col = "black", size = 0.5) +
+  geom_abline(intercept = int1, slope = slope1, col = "black") +
+  geom_abline(intercept = int2, slope = slope2, col = "black") +
   ylab("deleterious mutations in ROH (%)") +
   #xlab(expression(paste("F"["ROH"]," (%)")))+
   xlab(expression("F"["ROH"]))+
@@ -1131,9 +1174,9 @@ ggp1 = ggp +
         axis.title.y = element_text(angle = 90, size = 16), axis.text.y = element_text(size = 14)) +
   theme(legend.title = element_blank(), legend.text = element_text(size = 12)) +
   #theme(panel.background = element_rect(fill = NA, color = "black")) +
-  scale_colour_manual(breaks = c("ranthambore","wayanad","Kanha"),
-                      labels = c("Ranthambore","Wayanad","Kanha"), 
-                      values = cols[c(2,5,9)]) +
+  scale_colour_manual(breaks = c("ranthambore","wayanad","Kanha","zoo","panindia"),
+                      labels = c("Ranthambore","Wayanad","Kanha","Zoo","others"), 
+                      values = cols[c(2,5,9,7,1)]) +
   scale_shape_manual(values = c(16,1)) +
   theme(legend.position = "bottom")
 
@@ -1141,3 +1184,136 @@ png('Fig. 4.png', units="in", width=10, height=7, res=1000)
 ggp1
 dev.off()
 
+
+#b = b %>% filter(site != "zoo")
+ggp = ggplot() +
+  geom_point(data = b, aes(x = froh, y = mut_inROH, col = site, shape = type), size = 3) +
+  #geom_smooth(data = data.frame(y = pred1[3:11], x = seq(0.1,0.6,0.05)), aes(x = x,y = y), 
+  #            se = F, col = "black", size = 0.5) +
+  #geom_smooth(data = data.frame(y = pred1[21:26], x = seq(0.35,0.6,0.05)), aes(x = x,y = y), 
+  #            se = F, col = "black", size = 0.5) +
+  #geom_abline(intercept = int1, slope = slope1, col = "black") +
+  #geom_abline(intercept = int2, slope = slope2, col = "black") +
+  ylab("deleterious mutations in ROH (%)") +
+  #xlab(expression(paste("F"["ROH"]," (%)")))+
+  xlab(expression("F"["ROH"]))+
+  theme_tufte_revised()
+
+
+ggp1 = ggp +
+  theme(axis.title.x = element_text(size = 16), axis.text.x = element_text(size = 12),
+        axis.title.y = element_text(angle = 90, size = 16), axis.text.y = element_text(size = 14)) +
+  theme(legend.title = element_blank(), legend.text = element_text(size = 12)) +
+  #theme(panel.background = element_rect(fill = NA, color = "black")) +
+  scale_colour_manual(breaks = c("ranthambore","wayanad","Kanha","zoo","panindia"),
+                      labels = c("Ranthambore","Wayanad","Kanha","Zoo","others"), 
+                      values = cols[c(2,5,9,7,1)]) +
+  scale_shape_manual(values = c(16,1)) +
+  theme(legend.position = "bottom")
+
+png('Fig. 4b.png', units="in", width=10, height=7, res=1000)
+ggp1
+dev.off()
+
+
+
+
+###########################################################################
+
+
+library(tidyverse)
+library(ggthemes)
+theme_set(theme_tufte())
+
+is.extrafont.installed <- function(){
+  if(is.element("extrafont", installed.packages()[,1])){
+    library(extrafont)
+    # probably need something here to run font_import()
+    return(T)
+  }else{
+    warning("Library extrafont installed; using system sans/serif libraries as fallback fonts. 
+    To enable full font support, run: 
+      install.packages('extrafont') 
+      font_import()")
+    return(F)
+  }
+}
+
+base_font_family_tufte <- function(){
+  if(is.extrafont.installed()){
+    library(extrafont)
+    tuftefont <- choose_font(c("Gill Sans MT", "Gill Sans", "GillSans", "Verdana", "serif"), quiet = FALSE)  
+  }else{
+    tuftefont <- "serif"
+  }
+  return(tuftefont)
+}
+
+theme_tufte_revised <- function(base_size = 11, base_family = base_font_family_tufte(), ticks = TRUE) {
+  
+  ret <- theme_bw(base_family = base_family, base_size = base_size) + 
+    theme(
+      axis.line = element_line(color = 'black'),
+      axis.title.x = element_text(vjust = -0.3), 
+      axis.title.y = element_text(vjust = 0.8),
+      legend.background = element_blank(), 
+      legend.key = element_blank(), 
+      legend.title = element_text(face="plain"),
+      panel.background = element_blank(), 
+      panel.border = element_blank(),
+      panel.grid = element_blank(),
+      plot.background = element_blank(),
+      strip.background = element_blank()
+    )
+  
+  if (!ticks) {
+    ret <- ret + theme(axis.ticks = element_blank())
+  }
+  
+  ret
+} 
+
+require(extrafont)
+
+a = read.csv("R_file_loads_lof_jacknife.csv")
+b = read.csv("R_file_loads_missense_jacknife.csv")
+
+c = data.frame(comp = c(rep(names(a), each = length(a[,1])),rep(names(b), each = length(b[,1]))))
+c$type = rep(c("missense","loss-of-function"), each = 300)
+c$val = c(a[,1],a[,2],a[,3],b[,1],b[,2],b[,3])
+
+fit = lm((val - 1) ~ 0 + comp*type, data = c)
+summary(fit)
+
+newdata = data.frame(comp = rep(names(a),2), type = rep(c("missense","loss-of-function"), each = 3))
+
+pred1 = predict(fit, newdata, se.fit = T, type = "response")
+
+newdata$pred = pred1$fit + 1
+newdata$cil = newdata$pred - pred1$se.fit*1.96
+newdata$cir = newdata$pred + pred1$se.fit*1.96
+
+#pd = position_dodge(0.1)
+ggp = ggplot(data = newdata[newdata$type == "missense",], aes(x = comp, y = pred)) +
+  #facet_wrap(.~type, nrow = 2, ncol = 1, scales = "free_y") +
+  geom_point(size = 3) +
+  geom_errorbar(aes(ymin = cil, ymax = cir), size = 0.6, width = 0.04) +
+  xlab("pair-wise comparisons") +
+  ylab("relative deleterious loads")+
+  theme_tufte_revised()
+
+ggp1 = ggp +
+  theme(axis.title.x = element_text(size = 16), axis.text.x = element_text(size = 12),
+        axis.title.y = element_text(angle = 90, size = 16), axis.text.y = element_text(size = 14)) +
+  theme(legend.title = element_blank(), legend.text = element_text(size = 12)) +
+  theme(text=element_text(family="Gill Sans MT")) +
+  theme(strip.text.x = element_text(size = 15)) +
+  scale_x_discrete(breaks = c("RRTR.KTR","RWAY.KTR","RRTR.WAY"),
+                   labels = c("Ranthambore-Kanha","Wayanad-Kanha","Ranthambore-Wayanad")) +
+  geom_hline(yintercept = 1, linetype = "dotted", size = 0.5) +
+  #theme(panel.background = element_rect(fill = NA, color = "black")) +
+  theme(legend.position = "bottom")
+
+png('Fig. 3.png', units="in", width=7, height=7, res=1000)
+ggp1
+dev.off()
