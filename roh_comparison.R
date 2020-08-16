@@ -1134,7 +1134,7 @@ cMat = ginv(mat)
 
 b$comp = factor(b$comp, levels = c("all others","ranthambore"))
 
-fit = lm(mut_inROH ~ froh*comp*type, data = b, contrasts = list(comp = cMat))
+fit = lm(mut_inROH ~ 0 + comp:type + froh:comp:type, data = b, contrasts = list(comp = cMat))
 summary(fit)
 
 newdata = data.frame(comp = rep(c("all others","ranthambore"),each = 13), type = rep("missense",26), 
