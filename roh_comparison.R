@@ -1022,11 +1022,11 @@ theme_tufte_revised <- function(base_size = 11, base_family = base_font_family_t
 require(extrafont)
 
 a = read.csv("mutations.csv")
-a$site = factor(a$site,levels = c("ranthambore","wayanad","Kanha","zoo","panindia"))
+a$site = factor(a$site,levels = c("ranthambore","wayanad","Kanha","panindia"))
 mt1 = read.csv("miss_inROH.csv")
 mt2 = read.csv("lof_inROH.csv")
 
-mat = rbind(c(1,0,0,0,-1),c(0,1,0,0,-1),c(0,0,1,0,-1),c(0,0,0,1,-1))
+mat = rbind(c(1,0,0,-1),c(0,1,0,-1),c(0,0,1,-1))
 library(MASS)
 cMat = ginv(mat)
 
@@ -1034,7 +1034,7 @@ fit = glm(miss ~ site, weights = totalcount_m, data = a, contrasts = list(site =
           family = binomial(link = 'logit'))
 summary(fit)
 
-newdata = data.frame(site = c("ranthambore","wayanad","Kanha","zoo","panindia"))
+newdata = data.frame(site = c("ranthambore","wayanad","Kanha","panindia"))
 
 pred1 = predict(fit, newdata, se.fit = T, type = "response")
 
@@ -1045,9 +1045,9 @@ summary(fit)
 pred2 = predict(fit, newdata, se.fit = T, type = "response")
 
 mut = rbind(newdata,newdata)
-mut$type = c(rep("missense",5),rep("loss-of-function",5))
+mut$type = c(rep("missense",4),rep("loss-of-function",4))
 mut$type = factor(mut$type, levels = c("missense","loss-of-function"))
-mut$site = factor(mut$site,levels = c("ranthambore","wayanad","Kanha","zoo","panindia"))
+mut$site = factor(mut$site,levels = c("ranthambore","wayanad","Kanha","panindia"))
 mut$mean = c(pred1$fit,pred2$fit)
 mut$ci = c(pred1$se.fit*1.96,pred2$se.fit*1.96)
 mut$met = ""
@@ -1068,8 +1068,8 @@ ggp1 = ggp +
   theme(legend.title = element_blank(), legend.text = element_text(size = 12)) +
   theme(text=element_text(family="Gill Sans MT")) +
   theme(strip.text.x = element_text(size = 15)) +
-  scale_x_discrete(breaks = c("ranthambore","wayanad","Kanha","zoo","panindia"),
-                   labels = c("Ranthambore","Wayanad","Kanha","Zoo","All India")) +
+  scale_x_discrete(breaks = c("ranthambore","wayanad","Kanha","panindia"),
+                   labels = c("Ranthambore","Wayanad","Kanha","All India")) +
   geom_text(aes(label=met),hjust=-0.5,vjust=-0.5,size=20)+
   #theme(panel.background = element_rect(fill = NA, color = "black")) +
   theme(legend.position = "bottom")
@@ -1134,7 +1134,7 @@ cMat = ginv(mat)
 
 b$comp = factor(b$comp, levels = c("all others","ranthambore"))
 
-fit = lm(mut_inROH ~ 0 + comp:type + froh:comp:type, data = b, contrasts = list(comp = cMat))
+fit = lm(mut_inROH ~ 0 + comp:type + froh:type , data = b, contrasts = list(comp = cMat))
 summary(fit)
 
 newdata = data.frame(comp = rep(c("all others","ranthambore"),each = 13), type = rep("missense",26), 
@@ -1156,7 +1156,7 @@ slope2 = (pred1[24] - pred1[14])*2
 
 #b = b %>% filter(site != "zoo")
 ggp = ggplot() +
-  geom_point(data = b, aes(x = froh, y = mut_inROH, col = site, shape = type), size = 3) +
+  geom_point(data = b[b$type == "missense",], aes(x = froh, y = mut_inROH, col = site), size = 3) +
   #geom_smooth(data = data.frame(y = pred1[3:11], x = seq(0.1,0.6,0.05)), aes(x = x,y = y), 
   #            se = F, col = "black", size = 0.5) +
   #geom_smooth(data = data.frame(y = pred1[21:26], x = seq(0.35,0.6,0.05)), aes(x = x,y = y), 
@@ -1174,10 +1174,10 @@ ggp1 = ggp +
         axis.title.y = element_text(angle = 90, size = 16), axis.text.y = element_text(size = 14)) +
   theme(legend.title = element_blank(), legend.text = element_text(size = 12)) +
   #theme(panel.background = element_rect(fill = NA, color = "black")) +
-  scale_colour_manual(breaks = c("ranthambore","wayanad","Kanha","zoo","panindia"),
-                      labels = c("Ranthambore","Wayanad","Kanha","Zoo","others"), 
-                      values = cols[c(2,5,9,7,1)]) +
-  scale_shape_manual(values = c(16,1)) +
+  scale_colour_manual(breaks = c("ranthambore","wayanad","Kanha","panindia"),
+                      labels = c("Ranthambore","Wayanad","Kanha","others"), 
+                      values = cols[c(2,5,9,7)]) +
+  #scale_shape_manual(values = c(16,1)) +
   theme(legend.position = "bottom")
 
 png('Fig. 4.png', units="in", width=10, height=7, res=1000)
@@ -1187,7 +1187,7 @@ dev.off()
 
 #b = b %>% filter(site != "zoo")
 ggp = ggplot() +
-  geom_point(data = b, aes(x = froh, y = mut_inROH, col = site, shape = type), size = 3) +
+  geom_point(data = b[b$type == "missense",], aes(x = froh, y = mut_inROH, col = site), size = 3) +
   #geom_smooth(data = data.frame(y = pred1[3:11], x = seq(0.1,0.6,0.05)), aes(x = x,y = y), 
   #            se = F, col = "black", size = 0.5) +
   #geom_smooth(data = data.frame(y = pred1[21:26], x = seq(0.35,0.6,0.05)), aes(x = x,y = y), 
@@ -1205,10 +1205,10 @@ ggp1 = ggp +
         axis.title.y = element_text(angle = 90, size = 16), axis.text.y = element_text(size = 14)) +
   theme(legend.title = element_blank(), legend.text = element_text(size = 12)) +
   #theme(panel.background = element_rect(fill = NA, color = "black")) +
-  scale_colour_manual(breaks = c("ranthambore","wayanad","Kanha","zoo","panindia"),
-                      labels = c("Ranthambore","Wayanad","Kanha","Zoo","others"), 
-                      values = cols[c(2,5,9,7,1)]) +
-  scale_shape_manual(values = c(16,1)) +
+  scale_colour_manual(breaks = c("ranthambore","wayanad","Kanha","panindia"),
+                      labels = c("Ranthambore","Wayanad","Kanha","others"), 
+                      values = cols[c(2,5,9,7)]) +
+  #scale_shape_manual(values = c(16,1)) +
   theme(legend.position = "bottom")
 
 png('Fig. 4b.png', units="in", width=10, height=7, res=1000)
